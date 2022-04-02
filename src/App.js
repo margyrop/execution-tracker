@@ -1,4 +1,4 @@
-import FileLoader from "./components/fileloader";
+import FileLoader from "./components/FileLoader";
 import './App.css';
 
 function App() {

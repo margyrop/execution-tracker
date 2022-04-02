@@ -13,22 +13,62 @@ class FileLoader extends React.Component {
         };
     }
 
-    fileUploaded() {
-        var files = Array.from(document.getElementById("projectUpload").files);
+    addFiles(e){
+        e.stopPropagation();
+        e.preventDefault();
+
+        var fileList = [];
+
+        // if directory support is available
+        if(e.dataTransfer && e.dataTransfer.items)
+        {
+            var items = e.dataTransfer.items;
+            for (var i=0; i<items.length; i++) {
+                var item = items[i].webkitGetAsEntry();
+
+                if (item) {
+                  this.addDirectory(item, fileList);
+                }
+            }
+            this.setState({
+                filesUploaded: fileList
+            });
+            return;
+        }
+
+        // Fallback
+        var files = e.target.files || e.dataTransfer.files;
+        if (!files.length)
+        {
+            alert('File type not accepted');
+            return;
+        }
+
         this.setState({
             filesUploaded: files
-        }, this.readmultifiles());
-
+        });
     }
 
-    readmultifiles() {
-        this.readFile();
+    addDirectory(item, files) {
+        var _this = this;
+        if (item.isDirectory) {
+            var directoryReader = item.createReader();
+            directoryReader.readEntries(function(entries) {
+            entries.forEach(function(entry) {
+                    _this.addDirectory(entry, files);
+                });
+            });
+        } else {
+            item.file(function(file){
+                files.push(file);
+            });
+        }
     }
 
     readFile() {
         var reader = new FileReader();
-        if (this.state.index >= Array.from(document.getElementById("projectUpload").files)) return;
-        var file = Array.from(document.getElementById("projectUpload").files)[this.state.index];
+        if (this.state.index >= this.state.filesUploaded.length) return;
+        var file = this.state.filesUploaded[this.state.index];
         reader.onload = this.fileLoad.bind(this);
         reader.readAsText(file);
     }
@@ -43,10 +83,6 @@ class FileLoader extends React.Component {
         this.readFile();
     }
 
-    processFile(fileContects) {
-        this.readFileHelper(fileContects);
-    }
-
     readFileHelper(currentFile) {
         let index = currentFile.indexOf(this.state.apiPrefix);
         if (index !== -1) {
@@ -57,7 +93,6 @@ class FileLoader extends React.Component {
             this.readFileHelper(currentFile.substring(closingIndex + 1));
         }
     }
-
 
 
     apiPrefixChanged(e) {
@@ -97,8 +132,8 @@ class FileLoader extends React.Component {
                         </label>
                     </div>
                     <div className="row">
-                        <input type="file" id="projectUpload" multiple />
-                        <button type="button" onClick={this.fileUploaded.bind(this)}>Process</button>
+                        <input type="file" id="projectUpload" directory="" webkitdirectory="" onChange={this.addFiles.bind(this)}/>
+                        <button type="button" onClick={this.readFile.bind(this)}>Process</button>
                     </div>
                     <button type="button" onClick={this.loadEndpoints.bind(this)}>See Endpoints</button>
                 </form>
