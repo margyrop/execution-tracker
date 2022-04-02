@@ -87,6 +87,12 @@ class FileLoader extends React.Component {
         let index = currentFile.indexOf(this.state.apiPrefix);
         if (index !== -1) {
             let closingIndex = currentFile.indexOf('"', index + 1)
+            if (closingIndex === -1) {
+                closingIndex = currentFile.indexOf("'", index + 1)
+            }
+            if (closingIndex === -1) {
+                closingIndex = currentFile.indexOf("`", index + 1)
+            }
             let endpoint = currentFile.substring(index + 1, closingIndex);
             console.log(endpoint);
             this.state.endpoints.push(endpoint)
