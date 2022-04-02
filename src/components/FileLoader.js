@@ -13,21 +13,20 @@ class FileLoader extends React.Component {
         };
     }
 
-    addFiles(e){
+    addFiles(e) {
         e.stopPropagation();
         e.preventDefault();
 
         var fileList = [];
 
         // if directory support is available
-        if(e.dataTransfer && e.dataTransfer.items)
-        {
+        if (e.dataTransfer && e.dataTransfer.items) {
             var items = e.dataTransfer.items;
-            for (var i=0; i<items.length; i++) {
+            for (var i = 0; i < items.length; i++) {
                 var item = items[i].webkitGetAsEntry();
 
                 if (item) {
-                  this.addDirectory(item, fileList);
+                    this.addDirectory(item, fileList);
                 }
             }
             this.setState({
@@ -38,8 +37,7 @@ class FileLoader extends React.Component {
 
         // Fallback
         var files = e.target.files || e.dataTransfer.files;
-        if (!files.length)
-        {
+        if (!files.length) {
             alert('File type not accepted');
             return;
         }
@@ -53,13 +51,13 @@ class FileLoader extends React.Component {
         var _this = this;
         if (item.isDirectory) {
             var directoryReader = item.createReader();
-            directoryReader.readEntries(function(entries) {
-            entries.forEach(function(entry) {
+            directoryReader.readEntries(function (entries) {
+                entries.forEach(function (entry) {
                     _this.addDirectory(entry, files);
                 });
             });
         } else {
-            item.file(function(file){
+            item.file(function (file) {
                 files.push(file);
             });
         }
@@ -85,17 +83,24 @@ class FileLoader extends React.Component {
 
     readFileHelper(currentFile) {
         let index = currentFile.indexOf(this.state.apiPrefix);
+        let closingIndex = index + this.state.apiPrefix.length;
         if (index !== -1) {
-            let closingIndex = currentFile.indexOf('"', index + 1)
-            if (closingIndex === -1) {
-                closingIndex = currentFile.indexOf("'", index + 1)
+            switch (currentFile[index - 1]) {
+                case '"':
+                    closingIndex = currentFile.indexOf('"', index + 1);
+                    break;
+                case "'":
+                    closingIndex = currentFile.indexOf("'", index + 1);
+                    break;
+                case "`":
+                    closingIndex = currentFile.indexOf("`", index + 1);
+                    break;
             }
-            if (closingIndex === -1) {
-                closingIndex = currentFile.indexOf("`", index + 1)
+            if (closingIndex !== index + this.state.apiPrefix.length) {
+                let endpoint = currentFile.substring(index + 1, closingIndex);
+                console.log(endpoint);
+                this.state.endpoints.push(endpoint);
             }
-            let endpoint = currentFile.substring(index + 1, closingIndex);
-            console.log(endpoint);
-            this.state.endpoints.push(endpoint)
             this.readFileHelper(currentFile.substring(closingIndex + 1));
         }
     }
@@ -103,7 +108,7 @@ class FileLoader extends React.Component {
 
     apiPrefixChanged(e) {
         this.setState({
-            apiPrefix: `"${e.target.value}`
+            apiPrefix: `${e.target.value}`
         });
     }
 
@@ -138,7 +143,7 @@ class FileLoader extends React.Component {
                         </label>
                     </div>
                     <div className="row">
-                        <input type="file" id="projectUpload" directory="" webkitdirectory="" onChange={this.addFiles.bind(this)}/>
+                        <input type="file" id="projectUpload" directory="" webkitdirectory="" onChange={this.addFiles.bind(this)} />
                         <button type="button" onClick={this.readFile.bind(this)}>Process</button>
                     </div>
                     <button type="button" onClick={this.loadEndpoints.bind(this)}>See Endpoints</button>
