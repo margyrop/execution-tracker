@@ -224,10 +224,6 @@ class FileLoader extends React.Component {
             if (spNameIndex !== -1) {
                 let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
                 this.state.methodEndpointMap.find((o) => o.spConstant === this.state.spConstantName).spName = spName;
-                this.setState({
-                    daoIndex: 0,
-                    spIndex: 0
-                });
             }
         }
     }
