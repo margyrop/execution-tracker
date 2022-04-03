@@ -211,7 +211,6 @@ class FileLoader extends React.Component {
                 this.state.methodEndpointMap.find((o) => o.daoMethod === this.state.daoMethodName).spConstant = constName;
                 this.setState({
                     spConstantName: constName,
-                    daoMethodName: ''
                 }, () => this.readFile(null, constName));
             }
         }
@@ -226,7 +225,6 @@ class FileLoader extends React.Component {
                 let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
                 this.state.methodEndpointMap.find((o) => o.spConstant === this.state.spConstantName).spName = spName;
                 this.setState({
-                    spConstantName: '',
                     daoIndex: 0,
                     spIndex: 0
                 });
