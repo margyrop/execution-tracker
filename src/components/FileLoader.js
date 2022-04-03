@@ -215,7 +215,7 @@ class FileLoader extends React.Component {
                 let spConstIndex = currentFile.indexOf('SP_', index);
                 if (spConstIndex !== -1) {
                     let constName = currentFile.substring(spConstIndex, currentFile.indexOf(',', spConstIndex));
-                    this.state.methodEndpointMap.find((o) => o.daoMethod === this.state.daoMethodName).spConstant = constName;
+                    this.state.methodEndpointMap.find((o) => o.daoMethod === daoMethodName).spConstant = constName;
                     this.state.spConstantNames.push(constName);
                 }
             }
@@ -225,14 +225,17 @@ class FileLoader extends React.Component {
 
     readFileHelperBackendSp(currentFile) {
         let index = -1;
-        index = currentFile.indexOf(this.state.spConstantName);
-        if (index !== -1) {
-            let spNameIndex = currentFile.indexOf('"', index);
-            if (spNameIndex !== -1) {
-                let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
-                this.state.methodEndpointMap.find((o) => o.spConstant === this.state.spConstantName).spName = spName;
+        this.state.spConstantNames.forEach(spConstantName => {
+            index = currentFile.indexOf(spConstantName);
+            if (index !== -1) {
+                let spNameIndex = currentFile.indexOf('"', index);
+                if (spNameIndex !== -1) {
+                    let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
+                    this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName).spName = spName;
+                }
             }
-        }
+        });
+        
     }
 
     readFileHelperUI(currentFile) {
