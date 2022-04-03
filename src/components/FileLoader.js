@@ -178,7 +178,7 @@ class FileLoader extends React.Component {
         let methodName = "";
         let methodIndex = -1;
         let methodEndIndex = -1;
-        this.state.endpoints.forEach(endpoint => {
+        this.state.endpoints.forEach(async endpoint => {
             index = currentFile.indexOf(endpoint);
             if (index !== -1) {
                 methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index) + 8) + 1;
@@ -192,8 +192,13 @@ class FileLoader extends React.Component {
                         daoMethodName: daoMethodName
                     }, () => this.readFile(daoMethodName, null));
                 }
+                await this.sleep(200);
             }
         });
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     readFileHelperBackendDao(currentFile) {
