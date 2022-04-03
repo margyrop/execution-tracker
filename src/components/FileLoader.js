@@ -133,7 +133,13 @@ class FileLoader extends React.Component {
 
         } else {
             if (this.state.index >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
-                this.readFile(true, false);
+                if (this.state.uploadType === BACKEND) {
+                    this.readFile(true, false);
+                } else {
+                    this.setState({
+                        index: 0
+                    });
+                }
                 return;
             }
             var file = this.state.uploadType === UI ? this.state.filesUploadedUI[this.state.index] : this.state.filesUploadedBackend[this.state.index];
