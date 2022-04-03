@@ -186,7 +186,7 @@ class FileLoader extends React.Component {
                 methodName = currentFile.substring(methodIndex, methodEndIndex);
                 let daoIndex = currentFile.indexOf("DAO", methodEndIndex);
                 if (daoIndex !== -1) {
-                    let daoMethodName = currentFile.substring(currentFile.findIndex('.', daoIndex) + 1, currentFile.findIndex('(', daoIndex));
+                    let daoMethodName = currentFile.substring(currentFile.indexOf('.', daoIndex) + 1, currentFile.indexOf('(', daoIndex));
                     this.state.methodEndpointMap.push({endpoint: endpoint, method: methodName, daoMethod: daoMethodName});
                     this.setState({
                         daoMethodName: daoMethodName
@@ -198,9 +198,9 @@ class FileLoader extends React.Component {
 
     readFileHelperBackendDao(currentFile) {
         let index = -1;
-        index = currentFile.findIndex(` ${this.state.daoMethodName}`);
+        index = currentFile.indexOf(` ${this.state.daoMethodName}`);
         if (index !== -1) {
-            let spConstIndex = currentFile.findIndex('SP_', index);
+            let spConstIndex = currentFile.indexOf('SP_', index);
             if (spConstIndex !== -1) {
                 let constName = currentFile.substring(spConstIndex, currentFile.indexOf(',', spConstIndex));
                 this.state.find((o) => o.daoMethod === this.state.daoMethodName).spConstant = constName;
@@ -214,9 +214,9 @@ class FileLoader extends React.Component {
 
     readFileHelperBackendSp(currentFile) {
         let index = -1;
-        index = currentFile.findIndex(this.state.spConstantName);
+        index = currentFile.indexOf(this.state.spConstantName);
         if (index !== -1) {
-            let spNameIndex = currentFile.findIndex('"', index);
+            let spNameIndex = currentFile.indexOf('"', index);
             if (spNameIndex !== -1) {
                 let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
                 this.state.find((o) => o.spConstant === this.state.spConstantName).spName = spName;
