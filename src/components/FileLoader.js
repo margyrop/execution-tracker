@@ -147,8 +147,7 @@ class FileLoader extends React.Component {
         // do sth with bin
         this.setState({
             spIndex: this.state.spIndex + 1
-        });
-        this.readFile(this.state.spConstantName, null);
+        }, () => this.readFile(this.state.spConstantName, null));
     }
 
     fileLoadDao(e) {
@@ -156,8 +155,7 @@ class FileLoader extends React.Component {
         // do sth with bin
         this.setState({
             daoIndex: this.state.daoIndex + 1
-        });
-        this.readFile(this.state.daoMethodName, null);
+        }, () => this.readFile(this.state.daoMethodName, null));
     }
 
     fileLoad(e) {
@@ -169,8 +167,8 @@ class FileLoader extends React.Component {
         // do sth with bin
         this.setState({
             index: this.state.index + 1
-        });
-        this.readFile();
+        }, () => this.readFile());
+        
     }
 
     readFileHelperBackend(currentFile) {
