@@ -17,7 +17,11 @@ class FileLoader extends React.Component {
             uploadType: "",
             processUIDisabled: false,
             processBackendDisabled: false,
-            methodEndpointMap: []
+            methodEndpointMap: [],
+            daoIndex: 0,
+            spIndex: 0,
+            daoMethodName: "",
+            spConstantName: ''
         };
     }
 
@@ -107,15 +111,53 @@ class FileLoader extends React.Component {
         this.readFile();
     }
 
-    readFile() {
+    readFile(findDao, findSp) {
         var reader = new FileReader();
-        if (this.state.index >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
-            this.setState({index: 0});
-            return;
+        if (findDao) {
+            if (this.state.daoIndex >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
+                this.setState({daoIndex: 0});
+                return;
+            }
+            var file = this.state.filesUploadedBackend[this.state.daoIndex];
+            reader.onload = this.fileLoadDao.bind(this);
+            reader.readAsText(file);
+        } else if (findSp) {
+            if (this.state.spIndex >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
+                this.setState({spIndex: 0});
+                return;
+            }
+            var file = this.state.filesUploadedBackend[this.state.spIndex];
+            reader.onload = this.fileLoadSp.bind(this);
+            reader.readAsText(file);
+
+        } else {
+            if (this.state.index >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
+                this.setState({index: 0});
+                return;
+            }
+            var file = this.state.uploadType === UI ? this.state.filesUploadedUI[this.state.index] : this.state.filesUploadedBackend[this.state.index];
+            reader.onload = this.fileLoad.bind(this);
+            reader.readAsText(file);
         }
-        var file = this.state.uploadType === UI ? this.state.filesUploadedUI[this.state.index] : this.state.filesUploadedBackend[this.state.index];
-        reader.onload = this.fileLoad.bind(this);
-        reader.readAsText(file);
+        
+    }
+
+    fileLoadSp(e) {
+        this.readFileHelperBackendSp(e.target.result);
+        // do sth with bin
+        this.setState({
+            spIndex: this.state.spIndex + 1
+        });
+        this.readFile(this.state.spConstantName, null);
+    }
+
+    fileLoadDao(e) {
+        this.readFileHelperBackendDao(e.target.result);
+        // do sth with bin
+        this.setState({
+            daoIndex: this.state.daoIndex + 1
+        });
+        this.readFile(this.state.daoMethodName, null);
     }
 
     fileLoad(e) {
@@ -142,9 +184,49 @@ class FileLoader extends React.Component {
                 methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index) + 8) + 1;
                 methodEndIndex = currentFile.indexOf('(', methodIndex + 1);
                 methodName = currentFile.substring(methodIndex, methodEndIndex);
-                this.state.methodEndpointMap.push({endpoint: endpoint, method: methodName});
+                let daoIndex = currentFile.indexOf("DAO", methodEndIndex);
+                if (daoIndex !== -1) {
+                    let daoMethodName = currentFile.substring(currentFile.findIndex('.', daoIndex) + 1, currentFile.findIndex('(', daoIndex));
+                    this.state.methodEndpointMap.push({endpoint: endpoint, method: methodName, daoMethod: daoMethodName});
+                    this.setState({
+                        daoMethodName: daoMethodName
+                    }, () => this.readFile(daoMethodName, null));
+                }
             }
         });
+    }
+
+    readFileHelperBackendDao(currentFile) {
+        let index = -1;
+        index = currentFile.findIndex(` ${this.state.daoMethodName}`);
+        if (index !== -1) {
+            let spConstIndex = currentFile.findIndex('SP_', index);
+            if (spConstIndex !== -1) {
+                let constName = currentFile.substring(spConstIndex, currentFile.indexOf(',', spConstIndex));
+                this.state.find((o) => o.daoMethod === this.state.daoMethodName).spConstant = constName;
+                this.setState({
+                    spConstantName: constName,
+                    daoMethodName: ''
+                }, () => this.readFile(null, constName));
+            }
+        }
+    }
+
+    readFileHelperBackendSp(currentFile) {
+        let index = -1;
+        index = currentFile.findIndex(this.state.spConstantName);
+        if (index !== -1) {
+            let spNameIndex = currentFile.findIndex('"', index);
+            if (spNameIndex !== -1) {
+                let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
+                this.state.find((o) => o.spConstant === this.state.spConstantName).spName = spName;
+                this.setState({
+                    spConstantName: '',
+                    daoIndex: 0,
+                    spIndex: 0
+                });
+            }
+        }
     }
 
     readFileHelperUI(currentFile) {
@@ -184,7 +266,7 @@ class FileLoader extends React.Component {
     loadMap() {
         let items = [];
         this.state.methodEndpointMap.forEach(endpoint => {
-            items.push(<li>{`Endpoint: ${endpoint.endpoint} | Method: ${endpoint.method}`}</li>)
+            items.push(<li>{`Endpoint: ${endpoint.endpoint} | Method: ${endpoint.method} | SP Name: ${endpoint.spName}`}</li>)
         });
         this.setState({
             endpointComp: items
