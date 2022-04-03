@@ -27,7 +27,7 @@ class FileLoader extends React.Component {
             spIndex: 0,
             daoMethodName: "",
             spConstantName: '',
-            columnDefs: this.getColDefs()
+            columnDefs: this.getColDefs(),
         };
     }
 
@@ -295,7 +295,8 @@ class FileLoader extends React.Component {
             items.push(<li>{`Endpoint: ${endpoint.endpoint} | Method: ${endpoint.method} | SP Name: ${endpoint.spName}`}</li>)
         });
         this.setState({
-            endpointComp: items
+            endpointComp: items,
+            methodEndpointMap: this.state.methodEndpointMap
         });
     }
 
