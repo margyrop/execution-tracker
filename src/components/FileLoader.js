@@ -147,7 +147,7 @@ class FileLoader extends React.Component {
         // do sth with bin
         this.setState({
             spIndex: this.state.spIndex + 1
-        }, () => this.readFile(this.state.spConstantName, null));
+        }, () => this.readFile(null, this.state.spConstantName));
     }
 
     fileLoadDao(e) {
