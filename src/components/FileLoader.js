@@ -117,7 +117,9 @@ class FileLoader extends React.Component {
         var reader = new FileReader();
         if (findDao) {
             if (this.state.daoIndex >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
-                this.readFile(false, true);
+                this.setState({
+                    daoIndex: 0
+                }, () => this.readFile(false, true));
                 return;
             }
             var file = this.state.filesUploadedBackend[this.state.daoIndex];
@@ -125,6 +127,9 @@ class FileLoader extends React.Component {
             reader.readAsText(file);
         } else if (findSp) {
             if (this.state.spIndex >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
+                this.setState({
+                    spIndex: 0
+                });
                 return;
             }
             var file = this.state.filesUploadedBackend[this.state.spIndex];
@@ -134,7 +139,9 @@ class FileLoader extends React.Component {
         } else {
             if (this.state.index >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
                 if (this.state.uploadType === BACKEND) {
-                    this.readFile(true, false);
+                    this.setState({
+                        index: 0
+                    }, () => this.readFile(true, false));
                 } else {
                     this.setState({
                         index: 0
