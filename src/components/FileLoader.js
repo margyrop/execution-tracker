@@ -307,14 +307,15 @@ class FileLoader extends React.Component {
     render() {
         return (
             <div>
-                <form onSubmit={this.handleSubmit}>
-                    <div show={this.state.endpointComp !== null}>
+                 <div className="ag-theme-alpine" style={{margin: 'auto', height: 400, width: 600}}>
                         <AgGridReact
                             rowData={this.state.methodEndpointMap}
                             columnDefs={this.state.columnDefs}
                         >
                         </AgGridReact>
                     </div>
+                <form onSubmit={this.handleSubmit}>
+                   
                     <div className="row">
                         <label>
                             API Prefix
