@@ -214,7 +214,7 @@ class FileLoader extends React.Component {
             if (index !== -1) {
                 let spConstIndex = currentFile.indexOf('SP_', index);
                 if (spConstIndex !== -1) {
-                    let constName = currentFile.substring(spConstIndex, currentFile.indexOf(',', spConstIndex));
+                    let constName = currentFile.substring(spConstIndex, this.regexIndexOf(currentFile, /[^a-zA-Z\d\s:]/, spConstIndex));
                     this.state.methodEndpointMap.find((o) => o.daoMethod === daoMethodName).spConstant = constName;
                     this.state.spConstantNames.push(constName);
                 }
@@ -231,7 +231,9 @@ class FileLoader extends React.Component {
                 let spNameIndex = currentFile.indexOf('"', index);
                 if (spNameIndex !== -1) {
                     let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
-                    this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName).spName = spName;
+                    if (this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName)) {
+                        this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName).spName = spName;
+                    }
                 }
             }
         });
@@ -282,6 +284,11 @@ class FileLoader extends React.Component {
         });
     }
 
+    regexIndexOf(text, re, i) {
+        var indexInSuffix = text.slice(i).search(re);
+        return indexInSuffix < 0 ? indexInSuffix : indexInSuffix + i;
+    }
+
     render() {
         return (
             <div>
@@ -327,7 +334,7 @@ class FileLoader extends React.Component {
                     </div>
                     <div className="row">
                         <div className="loading-bar-container" style={{display: this.state.processBackendDisabled ? 'block' : 'none'}}>
-                            <div className="loading-bar" style={{width: this.state.index !== 0 ? `${((this.state.index + this.state.daoIndex + this.state.spIndex) / this.state.filesUploadedBackend.length * 3) * 400}px` : '400px'}}></div>
+                            <div className="loading-bar" style={{width: this.state.index !== 0 ? `${((this.state.index + this.state.daoIndex + this.state.spIndex) / (this.state.filesUploadedBackend.length * 3)) * 400}px` : '400px'}}></div>
                         </div>
                     </div>
                     <button className="btn" type="button" onClick={this.loadMap.bind(this)}>See Executions</button>
