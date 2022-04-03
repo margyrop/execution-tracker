@@ -139,8 +139,8 @@ class FileLoader extends React.Component {
         this.state.endpoints.forEach(endpoint => {
             index = currentFile.indexOf(endpoint);
             if (index !== -1) {
-                methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index)) + 1;
-                methodEndIndex = currentFile.indexOf(')', methodIndex + 1);
+                methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index)) + 8;
+                methodEndIndex = currentFile.indexOf('(', methodIndex + 1);
                 methodName = currentFile.substring(methodIndex, methodEndIndex);
                 this.state.methodEndpointMap.push({endpoint: endpoint, method: methodName});
             }
@@ -181,10 +181,10 @@ class FileLoader extends React.Component {
         });
     }
 
-    loadEndpoints() {
+    loadMap() {
         let items = [];
-        this.state.endpoints.forEach(endpoint => {
-            items.push(<li>{endpoint}</li>)
+        this.state.methodEndpointMap.forEach(endpoint => {
+            items.push(<li>{`Endpoint: ${endpoint.endpoint} | Method: ${endpoint.method}`}</li>)
         });
         this.setState({
             endpointComp: items
@@ -239,7 +239,7 @@ class FileLoader extends React.Component {
                             <div className="loading-bar" style={{width: this.state.index !== 0 ? `${(this.state.index / this.state.filesUploadedBackend.length) * 400}px` : '400px'}}></div>
                         </div>
                     </div>
-                    <button className="btn" type="button" onClick={this.loadEndpoints.bind(this)}>See Endpoints</button>
+                    <button className="btn" type="button" onClick={this.loadMap.bind(this)}>See Executions</button>
                 </form>
             </div>
         );
