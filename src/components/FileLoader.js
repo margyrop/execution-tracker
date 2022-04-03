@@ -13,7 +13,7 @@ class FileLoader extends React.Component {
             currentFile: "",
             endpoints: [],
             daoMethodNames: [],
-            spConstants: [],
+            spConstantNames: [],
             endpointComp: "",
             index: 0,
             uploadType: "",
