@@ -1,0 +1,32 @@
+.browse {
+    float: none !important;
+    width: 200px;
+}
+
+.browse-input {
+    width: 200px !important;
+    float: none !important;
+    
+    margin: auto !important;
+}
+
+.loading-bar-container {
+    width: 400px;
+    background-color: grey;
+    height: 30px;
+    position: relative;
+    margin: auto;
+}
+
+.loading-bar {
+    background: green;
+    display: block;
+    height: 30px;
+    box-shadow: inset 0px 0px 10px -1px white;
+}
+
+.api-prefix {
+    color: black;
+    text-align: center;
+    width: 300px !important; 
+}
