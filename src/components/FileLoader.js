@@ -139,7 +139,7 @@ class FileLoader extends React.Component {
         this.state.endpoints.forEach(endpoint => {
             index = currentFile.indexOf(endpoint);
             if (index !== -1) {
-                methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index)) + 8;
+                methodIndex = currentFile.indexOf(' ', currentFile.indexOf('public ', index) + 8) + 1;
                 methodEndIndex = currentFile.indexOf('(', methodIndex + 1);
                 methodName = currentFile.substring(methodIndex, methodEndIndex);
                 this.state.methodEndpointMap.push({endpoint: endpoint, method: methodName});
