@@ -1,8 +1,9 @@
 import React from "react";
 import './FileLoader.css';
-import { AgGridReact } from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+
 const UI = "UI";
 const BACKEND = "BACKEND";
 
@@ -28,17 +29,18 @@ class FileLoader extends React.Component {
             daoMethodName: "",
             spConstantName: '',
             columnDefs: this.getColDefs(),
+            loadingSp: false,
         };
     }
 
     getColDefs() {
         return [
             // uses the default column properties
-            { headerName: 'Endpoint', field: 'endpoint' },
+            {headerName: 'Endpoint', field: 'endpoint', resizable: true, width: 400},
             // overrides the default with a number filter
-            { headerName: 'DAO Method Name', field: 'daoMethodName' },
+            {headerName: 'DAO Method Name', field: 'daoMethod', resizable: true, width: 400},
             // overrides the default using a column type
-            { headerName: 'SP Name', field: 'spName' }
+            {headerName: 'SP Name', field: 'spName', resizable: true, width: 400}
         ];
     }
 
@@ -141,6 +143,7 @@ class FileLoader extends React.Component {
             reader.onload = this.fileLoadDao.bind(this);
             reader.readAsText(file);
         } else if (findSp) {
+            this.setState({loadingSp: true});
             if (this.state.spIndex >= (this.state.uploadType === UI ? this.state.filesUploadedUI.length : this.state.filesUploadedBackend.length)) {
                 this.setState({
                     spIndex: 0
@@ -214,7 +217,11 @@ class FileLoader extends React.Component {
                 let daoIndex = currentFile.indexOf("DAO", methodEndIndex);
                 if (daoIndex !== -1) {
                     let daoMethodName = currentFile.substring(currentFile.indexOf('.', daoIndex) + 1, currentFile.indexOf('(', daoIndex));
-                    this.state.methodEndpointMap.push({ endpoint: endpoint, method: methodName, daoMethod: daoMethodName });
+                    this.state.methodEndpointMap.push({
+                        endpoint: endpoint,
+                        method: methodName,
+                        daoMethod: daoMethodName
+                    });
                     this.state.daoMethodNames.push(daoMethodName);
                 }
             }
@@ -291,12 +298,13 @@ class FileLoader extends React.Component {
 
     loadMap() {
         let items = [];
-        this.state.methodEndpointMap.forEach(endpoint => {
-            items.push(<li>{`Endpoint: ${endpoint.endpoint} | Method: ${endpoint.method} | SP Name: ${endpoint.spName}`}</li>)
-        });
+        var map = this.state.methodEndpointMap;
+        var map2 = map.filter((e) => e.spName);
+        map2 = map2.concat({});
         this.setState({
             endpointComp: items,
-            methodEndpointMap: this.state.methodEndpointMap
+            successMsg: `Successfully found ${map2.length} complete execution paths for ${map.length} endpoints on the ${this.state.apiPrefix} API.`,
+            methodEndpointMap: map2
         });
     }
 
@@ -308,22 +316,26 @@ class FileLoader extends React.Component {
     render() {
         return (
             <div>
-                 <div className="ag-theme-alpine" style={{margin: 'auto', height: 400, width: 600}}>
-                        <AgGridReact
-                            rowData={this.state.methodEndpointMap}
-                            columnDefs={this.state.columnDefs}
-                        >
-                        </AgGridReact>
-                    </div>
-                <form onSubmit={this.handleSubmit}>
-                   
+                <h3 className="row" style={{display: this.state.successMsg ? 'block' : 'none'}}>
+                    {this.state.successMsg}
+                </h3>
+                <div className="row ag-theme-alpine" style={{margin: 'auto', height: 400, width: 1200}}>
+                    <AgGridReact
+                        rowData={this.state.methodEndpointMap}
+                        columnDefs={this.state.columnDefs}
+                    >
+                    </AgGridReact>
+                </div>
+                <form>
+
                     <div className="row">
                         <label>
                             API Prefix
                         </label>
                     </div>
                     <div className="row">
-                        <input className="api-prefix" type="text" id="apiPrefix" onChange={this.apiPrefixChanged.bind(this)} />
+                        <input className="api-prefix" type="text" id="apiPrefix"
+                               onChange={this.apiPrefixChanged.bind(this)}/>
                     </div>
                     <div className="row">
                         <label>Upload UI Files</label>
@@ -332,12 +344,15 @@ class FileLoader extends React.Component {
                         <div class="file-field input-field">
                             <div class="btn browse">
                                 <span>Browse</span>
-                                <input className="browse-input" type="file" id="projectUploadUI" directory="" webkitdirectory="" onChange={this.addFilesUI.bind(this)} />
+                                <input className="browse-input" type="file" id="projectUploadUI" directory=""
+                                       webkitdirectory="" onChange={this.addFilesUI.bind(this)}/>
                             </div>
                         </div>
                     </div>
                     <div className="row">
-                        <button disabled={this.state.processUIDisabled} className="btn" type="button" onClick={this.readFileUI.bind(this)}>Process</button>
+                        <button disabled={this.state.processUIDisabled} className="btn" type="button"
+                                onClick={this.readFileUI.bind(this)}>Process
+                        </button>
                     </div>
                     <div className="row">
                         <label>Upload Backend Files</label>
@@ -346,16 +361,21 @@ class FileLoader extends React.Component {
                         <div class="file-field input-field">
                             <div class="btn browse">
                                 <span>Browse</span>
-                                <input className="browse-input" type="file" id="projectUploadBackend" directory="" webkitdirectory="" onChange={this.addFilesBackend.bind(this)} />
+                                <input className="browse-input" type="file" id="projectUploadBackend" directory=""
+                                       webkitdirectory="" onChange={this.addFilesBackend.bind(this)}/>
                             </div>
                         </div>
                     </div>
                     <div className="row">
-                        <button disabled={this.state.processBackendDisabled} className="btn" type="button" onClick={this.readFileBackend.bind(this)}>Process</button>
+                        <button disabled={this.state.processBackendDisabled} className="btn" type="button"
+                                onClick={this.readFileBackend.bind(this)}>Process
+                        </button>
                     </div>
                     <div className="row">
-                        <div className="loading-bar-container" style={{ display: this.state.processBackendDisabled ? 'block' : 'none' }}>
-                            <div className="loading-bar" style={{ width: `${((this.state.index + this.state.daoIndex + this.state.spIndex) / (this.state.filesUploadedBackend.length * 3)) * 400}px` }}></div>
+                        <div className="loading-bar-container"
+                             style={{display: this.state.processBackendDisabled ? 'block' : 'none'}}>
+                            <div className="loading-bar"
+                                 style={{width: `${(((this.state.spIndex === 0 && this.state.loadingSp) ? this.state.filesUploadedBackend.length : this.state.spIndex) / (this.state.filesUploadedBackend.length)) * 400}px`}}></div>
                         </div>
                     </div>
                     <button className="btn" type="button" onClick={this.loadMap.bind(this)}>See Executions</button>
