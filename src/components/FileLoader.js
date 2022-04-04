@@ -30,6 +30,7 @@ class FileLoader extends React.Component {
             spConstantName: '',
             columnDefs: this.getColDefs(),
             loadingSp: false,
+            searchResults: []
         };
     }
 
@@ -304,7 +305,7 @@ class FileLoader extends React.Component {
         this.setState({
             endpointComp: items,
             successMsg: `Successfully found ${map2.length} complete execution paths for ${map.length} endpoints on the ${this.state.apiPrefix} API.`,
-            methodEndpointMap: map2
+            searchResults: map2
         });
     }
 
@@ -313,15 +314,38 @@ class FileLoader extends React.Component {
         return indexInSuffix < 0 ? indexInSuffix : indexInSuffix + i;
     }
 
+    searchChange(e) {
+        let searchResults = e.target.value === '' ? this.state.methodEndpointMap : this.state.methodEndpointMap.filter((res) => {
+            let valid = false;
+            if (res.endpoint) {
+                valid = res.endpoint.toLowerCase().includes(e.target.value.toLowerCase());
+            }
+            if (res.daoMethod && !valid) {
+                valid = res.daoMethod.toLowerCase().includes(e.target.value.toLowerCase());
+            }
+            if (res.spName && !valid) {
+                valid = res.spName.toLowerCase().includes(e.target.value.toLowerCase());
+            }
+            return (valid && res.spName);
+        });
+        this.setState({
+            searchResults: searchResults
+        });
+    }
+
     render() {
         return (
             <div>
                 <h3 className="row" style={{display: this.state.successMsg ? 'block' : 'none'}}>
                     {this.state.successMsg}
                 </h3>
+                <div className="row">
+                    <label className="row">Search</label>
+                    <input className="row" type="text" id="searchField" style={{margin: 'auto', width: 400}} onChange={this.searchChange.bind(this)}/>
+                </div>
                 <div className="row ag-theme-alpine" style={{margin: 'auto', height: 400, width: 1200}}>
                     <AgGridReact
-                        rowData={this.state.methodEndpointMap}
+                        rowData={this.state.searchResults}
                         columnDefs={this.state.columnDefs}
                     >
                     </AgGridReact>
