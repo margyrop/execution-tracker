@@ -218,11 +218,11 @@ class FileLoader extends React.Component {
                 if (daoIndex !== -1) {
                     let daoMethodName = currentFile.substring(currentFile.indexOf('.', daoIndex) + 1, currentFile.indexOf('(', daoIndex));
                     this.state.methodEndpointMap.push({
-                        endpoint: endpoint,
-                        method: methodName,
-                        daoMethod: daoMethodName
+                        endpoint: endpoint.trim(),
+                        method: methodName.trim(),
+                        daoMethod: daoMethodName.trim()
                     });
-                    this.state.daoMethodNames.push(daoMethodName);
+                    this.state.daoMethodNames.push(daoMethodName.trim());
                 }
             }
         });
@@ -236,9 +236,9 @@ class FileLoader extends React.Component {
             if (index !== -1) {
                 let spConstIndex = currentFile.indexOf('SP_', index);
                 if (spConstIndex !== -1) {
-                    let constName = currentFile.substring(spConstIndex, this.regexIndexOf(currentFile, /[^a-zA-Z\d\s:_]/, spConstIndex));
-                    this.state.methodEndpointMap.find((o) => o.daoMethod === daoMethodName).spConstant = constName;
-                    this.state.spConstantNames.push(constName);
+                    let constName = currentFile.substring(spConstIndex, this.regexIndexOf(currentFile, /[^a-zA-Z_]/, spConstIndex));
+                    this.state.methodEndpointMap.find((o) => o.daoMethod === daoMethodName).spConstant = constName.trim();
+                    this.state.spConstantNames.push(constName.trim());
                 }
             }
         });
@@ -250,11 +250,11 @@ class FileLoader extends React.Component {
         this.state.spConstantNames.forEach(spConstantName => {
             index = currentFile.indexOf(spConstantName);
             if (index !== -1) {
-                let spNameIndex = currentFile.indexOf('"', index);
-                if (spNameIndex !== -1) {
+                let spNameIndex = currentFile.indexOf('".usp', index);
+                if (spNameIndex !== -1 && (spNameIndex - index <= 250)) {
                     let spName = currentFile.substring(spNameIndex + 1, currentFile.indexOf('"', spNameIndex + 1));
                     if (this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName)) {
-                        this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName).spName = spName;
+                        this.state.methodEndpointMap.find((o) => o.spConstant === spConstantName).spName = spName.trim();
                     }
                 }
             }
@@ -280,9 +280,9 @@ class FileLoader extends React.Component {
             if (closingIndex !== index + this.state.apiPrefix.length) {
                 let endpoint = currentFile.substring(index + 1, closingIndex);
                 endpoint = endpoint.substring(this.state.apiPrefix.length - 1);
-                console.log(endpoint);
-                if (!this.state.endpoints.includes(endpoint)) {
-                    this.state.endpoints.push(endpoint);
+                console.log(endpoint.trim());
+                if (!this.state.endpoints.includes(endpoint.trim())) {
+                    this.state.endpoints.push(endpoint.trim());
                 }
             }
             this.readFileHelperUI(currentFile.substring(closingIndex + 1));
