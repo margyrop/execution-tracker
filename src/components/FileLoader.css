@@ -6,7 +6,7 @@
 .browse-input {
     width: 200px !important;
     float: none !important;
-    
+
     margin: auto !important;
 }
 
@@ -28,5 +28,22 @@
 .api-prefix {
     color: black;
     text-align: center;
-    width: 300px !important; 
+    width: 300px !important;
+}
+
+.csv-container {
+    display: block;
+    width: 400px;
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border-radius: 4px;
+    box-shadow: black 0 0 15px -5px;
+}
+
+.excel-btn {
+    margin-left: 30px;
+    position: relative;
+    background-color: lightgreen;
+    float: left;
 }

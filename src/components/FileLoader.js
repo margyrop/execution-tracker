@@ -9,7 +9,7 @@ const BACKEND = "BACKEND";
 
 class FileLoader extends React.Component {
     constructor(props) {
-        super();
+        super(props);
         this.state = {
             filesUploadedUI: [],
             filesUploadedBackend: [],
@@ -30,9 +30,23 @@ class FileLoader extends React.Component {
             spConstantName: '',
             columnDefs: this.getColDefs(),
             loadingSp: false,
-            searchResults: []
+            searchResults: [],
+            gridOptions: {
+                defaultColDef: {
+                    sortable: true,
+                    filter: true,
+                    resizable: true,
+                }
+            },
+
         };
     }
+
+    onGridReady = (params) => {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+    };
+
 
     getColDefs() {
         return [
@@ -192,7 +206,7 @@ class FileLoader extends React.Component {
     }
 
     fileLoad(e) {
-        // get file content  
+        // get file content
         if (this.state.uploadType === UI)
             this.readFileHelperUI(e.target.result);
         else
@@ -333,22 +347,40 @@ class FileLoader extends React.Component {
         });
     }
 
+    exportGrid() {
+        this.setState({
+            csvTxt: this.gridApi.getDataAsCsv()
+        });
+    }
+
     render() {
         return (
             <div>
                 <h3 className="row" style={{display: this.state.successMsg ? 'block' : 'none'}}>
                     {this.state.successMsg}
                 </h3>
+                <textarea className="csv-container" id="csvResult"
+                          style={{display: this.state.csvTxt ? 'block' : 'none'}} value={this.state.csvTxt}>
+                </textarea>
                 <div className="row">
                     <label className="row">Search</label>
-                    <input className="row" type="text" id="searchField" style={{margin: 'auto', width: 400}} onChange={this.searchChange.bind(this)}/>
+                    <input className="row" type="text" id="searchField" style={{margin: 'auto', width: 400}}
+                           onChange={this.searchChange.bind(this)}/>
                 </div>
-                <div className="row ag-theme-alpine" style={{margin: 'auto', height: 400, width: 1200}}>
-                    <AgGridReact
-                        rowData={this.state.searchResults}
-                        columnDefs={this.state.columnDefs}
-                    >
-                    </AgGridReact>
+                <div className="row" style={{display: 'flex'}}>
+                    <div className="col s4"></div>
+                    <div className="col s4 ag-theme-alpine" style={{margin: 'auto', height: 400, width: 1200}}>
+                        <AgGridReact
+                            rowData={this.state.searchResults}
+                            columnDefs={this.state.columnDefs}
+                            gridOptions={this.state.gridOptions}
+                            onGridReady={this.onGridReady}
+                        >
+                        </AgGridReact>
+                    </div>
+                    <div className="col s4">
+                        <button type="button" className="btn excel-btn" onClick={this.exportGrid.bind(this)}>Export to CSV</button>
+                    </div>
                 </div>
                 <form>
 
